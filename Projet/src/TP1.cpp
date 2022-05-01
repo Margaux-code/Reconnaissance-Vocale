@@ -1,6 +1,7 @@
 
 #include <Arduino.h>
 #include <avr/io.h>
+byte led =5;
 enum ADC_modes
 {
   ADC_A0,
@@ -23,6 +24,9 @@ ADC_AIN1,
 ANALOG_MUX,
 ADC_AIN0,
 };
+
+double temp;
+
 void ADC_enable () // activer l’ADC
 {
 cli ();
@@ -283,15 +287,28 @@ ISR(ANALOG_COMP_vect){
 
 /* an example of a simple ace operation */
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  pinMode(led,OUTPUT);
+  pinMode(A0,INPUT);
   ADC_enable(); 
-  ADC_setPrescaler(64);
-  ADC_setReference(ADC_VCC); 
-  setAnalogMux(ADC_A4);
+  ADC_setPrescaler(32);
+  //leftAdjust(8);
+  ADC_setReference(ADC_1V1); 
+  setAnalogMux(ADC_A0);
 }
 
 void loop() {
+    //digitalWrite(led, HIGH);
   ADC_startConvert(); 
   while (!ADC_available());
-  Serial.println(ADC_read());
+  temp = ADC_read();
+ //temp = analogRead(A0);
+  Serial.println(temp);
+    /*if(ADC_read()>= 1000)
+    {
+        digitalWrite(led, HIGH);  
+        delay(1000);  }
+        else 
+        digitalWrite(led,LOW);*/
+
 }
