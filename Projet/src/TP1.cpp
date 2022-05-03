@@ -6,6 +6,9 @@
 #include <Adafruit_SSD1306.h>
 
 byte led = 5;
+int somme = 0;
+int moyenne;
+byte i;
 enum ADC_modes
 {
     ADC_A0,
@@ -268,8 +271,9 @@ void setup()
 
 void loop()
 {
-    int a=0;
-    for (byte i = 0; i < SAMPLES; i++)
+    
+    // Pour la fréquence d'échantillonnage on récupère les voltages venues du micro après un filtre passe-haut et l'AOP
+    for (i = 0; i < SAMPLES; i++)
     {
 
         ADC_startConvert();
@@ -277,27 +281,20 @@ void loop()
         {
             vReal[i] = ADC_read();
             temp = ADC_read();
-           
-           // 
-             //Serial.println(temp);
-             if (a<= vReal[i])
-             a=vReal[i];
-
-        }
-        
-        //////////////////////////////////
+            somme = vReal[i]; // Somme pour faire la moyenne
+        }       
         vImag[i] = 0;
     }
-
-      les_db = 37.364 * log(a) - 175.75;
-      Serial.println(les_db);
-         a=0;
+    moyenne = somme / i;                     // Moyenne permettant de trouver les dbs.
+    les_db = 37.364 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
+    Serial.println(les_db);
+    somme = 0; //Remise de la somme à zéro pour la prochaine fois 
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
-
     display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
-    for (byte i = 0; i < SAMPLES / 2 - 1; i++)
+    // Transformé de fourier et affichage 
+    for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
         dB = map(vReal[i], 0, 1023, 0, 52);
         display.fillRect(i * 4 + 1, abs(52 - dB) + 12, 3, dB, WHITE);
