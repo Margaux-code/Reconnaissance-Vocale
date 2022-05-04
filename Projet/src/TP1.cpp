@@ -283,13 +283,18 @@ void loop()
             vReal[i] = ADC_read();
             temp = ADC_read();
             somme = vReal[i]; // Somme pour faire la moyenne
+            if (moyenne <= vReal [i])
+            {
+                moyenne = vReal[i];
+            }
         }       
         vImag[i] = 0;
     }
-    moyenne = somme / i;                     // Moyenne permettant de trouver les dbs.
-    les_db = 37.364 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
+                    // Moyenne permettant de trouver les dbs.
+    les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
     Serial.println(les_db);
     somme = 0; //Remise de la somme à zéro pour la prochaine fois 
+    moyenne = 0;
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
