@@ -9,6 +9,7 @@ byte led = 5;
 int somme = 0;
 int moyenne;
 byte i;
+int a;
 enum ADC_modes
 {
     ADC_A0,
