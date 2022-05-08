@@ -5,9 +5,12 @@
 #include <arduinoFFT.h>
 #include <Adafruit_SSD1306.h>
 
-byte led = 5;
+byte led = 3;
+byte bouton = 2;
 int somme = 0;
+double somme2 = 0.0;
 int moyenne;
+double moyenne2;
 byte i;
 int a;
 enum ADC_modes
@@ -37,6 +40,75 @@ Adafruit_SSD1306 display(-1);
 #define SAMPLES 64
 double vReal[SAMPLES];
 double vImag[SAMPLES];
+//double SommeUn = 36013898.67;
+double SommeUn = 0.0;
+double correlation = 0.0;
+double tampon = 0.0;
+double vRefUn[SAMPLES] = {1334.2,
+1334.54,
+1240.48,
+875.73,
+358.79,
+123.97,
+201.42,
+139.15,
+138.85,
+266.59,
+239.16,
+81.29,
+87.91,
+95.84,
+109.27,
+256.73,
+149.55,
+59.9,
+49.17,
+47.03,
+24.56,
+35.41,
+55.97,
+38.83,
+97.42,
+78.36,
+62.94,
+28.98,
+28.75,
+27.86,
+28.96,
+21.3,
+6.8,
+21.3,
+28.96,
+27.86,
+28.75,
+28.98,
+62.94,
+78.36,
+97.42,
+38.83,
+55.97,
+35.41,
+24.56,
+47.03,
+49.17,
+59.9,
+149.55,
+256.73,
+109.27,
+95.84,
+87.91,
+81.29,
+239.16,
+266.59,
+138.85,
+139.15,
+201.42,
+123.97,
+358.79,
+875.73,
+1240.48,
+1334.54,
+};
 byte dB;
 long maxpeak;
 long les_db;
@@ -262,6 +334,7 @@ void setup()
     display.display();
     Serial.begin(9600);
     pinMode(led, OUTPUT);
+    pinMode(bouton, INPUT_PULLUP);
     pinMode(A0, INPUT);
     ADC_enable();
     ADC_setPrescaler(32);
@@ -292,13 +365,43 @@ void loop()
     }
                     // Moyenne permettant de trouver les dbs.
     les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
-    Serial.println(les_db);
+    //Serial.println(les_db);
     somme = 0; //Remise de la somme à zéro pour la prochaine fois 
     moyenne = 0;
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
     display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
+    /*
+    //Boucle pour rajouter un échantillon de son
+    if(digitalRead(bouton)){
+        for (i = 0; i < SAMPLES; i++)
+        {
+            Serial.println(vReal[i]);
+        }
+        Serial.println("\n \n \n \n \n");
+
+    }*/
+    somme2 = 0.0;
+    tampon = 0.0;
+    SommeUn = 0.0;
+    moyenne2 = 0.0;
+    for(i = 0; i<SAMPLES/2-1; i++)
+    {
+        somme2 += vReal[i]*vRefUn[i];
+        tampon += pow(vReal[i],2);
+        SommeUn += pow(vRefUn[i],2);
+    }
+    correlation = somme2/sqrt(tampon*SommeUn);
+    Serial.println(correlation);
+    Serial.println("\n");
+    somme =0;
+    moyenne =0;
+    if(correlation >= 0.90)
+    {
+        digitalWrite(led, HIGH);
+    }else 
+    digitalWrite(led, LOW);
     // Transformé de fourier et affichage 
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
@@ -306,7 +409,6 @@ void loop()
         display.fillRect(i * 4 + 1, abs(52 - dB) + 12, 3, dB, WHITE);
     }
     maxpeak = FFT.MajorPeak(vReal, SAMPLES, 5000);
-
     sprintf(buf, "%04li", les_db);
     display.setCursor(72, 16);
     display.print(F("dB:"));
