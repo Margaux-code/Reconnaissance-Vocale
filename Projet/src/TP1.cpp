@@ -44,70 +44,39 @@ double vImag[SAMPLES];
 double SommeUn = 0.0;
 double correlation = 0.0;
 double tampon = 0.0;
-double vRefUn[SAMPLES] = {1334.2,
-1334.54,
-1240.48,
-875.73,
-358.79,
-123.97,
-201.42,
-139.15,
-138.85,
-266.59,
-239.16,
-81.29,
-87.91,
-95.84,
-109.27,
-256.73,
-149.55,
-59.9,
-49.17,
-47.03,
-24.56,
-35.41,
-55.97,
-38.83,
-97.42,
-78.36,
-62.94,
-28.98,
-28.75,
-27.86,
-28.96,
-21.3,
-6.8,
-21.3,
-28.96,
-27.86,
-28.75,
-28.98,
-62.94,
-78.36,
-97.42,
-38.83,
-55.97,
-35.41,
-24.56,
-47.03,
-49.17,
-59.9,
-149.55,
-256.73,
-109.27,
-95.84,
-87.91,
-81.29,
-239.16,
-266.59,
-138.85,
-139.15,
-201.42,
-123.97,
-358.79,
-875.73,
-1240.48,
-1334.54,
+double vRefUn[SAMPLES] = {6771.148571,
+3291.705714,
+2015.495714,
+817.3171429,
+420.5242857,
+203.4528571,
+159.8771429,
+90.38,
+160.15,
+141.18,
+165.3671429,
+119.4842857,
+91.63428571,
+85.13142857,
+81.39571429,
+112.7157143,
+75.68857143,
+85.14285714,
+68.19,
+57.64714286,
+53.07714286,
+64.93714286,
+68.51857143,
+50.67,
+59.21714286,
+59.32285714,
+44.18142857,
+38.47571429,
+51.63285714,
+43.55571429,
+47.51714286,
+50.61142857,
+
 };
 byte dB;
 long maxpeak;
@@ -372,8 +341,9 @@ void loop()
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
     display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
-    /*
+    
     //Boucle pour rajouter un échantillon de son
+   
     if(digitalRead(bouton)){
         for (i = 0; i < SAMPLES; i++)
         {
@@ -381,7 +351,8 @@ void loop()
         }
         Serial.println("\n \n \n \n \n");
 
-    }*/
+    }
+    //Correlation avec un 
     somme2 = 0.0;
     tampon = 0.0;
     SommeUn = 0.0;
@@ -397,11 +368,12 @@ void loop()
     Serial.println("\n");
     somme =0;
     moyenne =0;
-    if(correlation >= 0.90)
+    if(correlation > 0.95)
     {
         digitalWrite(led, HIGH);
     }else 
     digitalWrite(led, LOW);
+    
     // Transformé de fourier et affichage 
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
