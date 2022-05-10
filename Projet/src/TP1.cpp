@@ -6,13 +6,20 @@
 #include <Adafruit_SSD1306.h>
 
 byte led = 3;
+byte led2 = 4;
 byte bouton = 2;
 int somme = 0;
-double somme2 = 0.0;
-int moyenne;
-double moyenne2;
+
+int moyenne = 0;
+
 byte i;
 int a;
+double SommeRef = 0.0;
+double sommeC = 0.0;
+double correlation1 = 0.0;
+double correlation2 = 0.0;
+double correlation = 0.0;
+double tampon = 0.0;
 enum ADC_modes
 {
     ADC_A0,
@@ -40,42 +47,75 @@ Adafruit_SSD1306 display(-1);
 #define SAMPLES 64
 double vReal[SAMPLES];
 double vImag[SAMPLES];
-//double SommeUn = 36013898.67;
-double SommeUn = 0.0;
-double correlation = 0.0;
-double tampon = 0.0;
-double vRefUn[SAMPLES] = {6771.148571,
-3291.705714,
-2015.495714,
-817.3171429,
-420.5242857,
-203.4528571,
-159.8771429,
-90.38,
-160.15,
-141.18,
-165.3671429,
-119.4842857,
-91.63428571,
-85.13142857,
-81.39571429,
-112.7157143,
-75.68857143,
-85.14285714,
-68.19,
-57.64714286,
-53.07714286,
-64.93714286,
-68.51857143,
-50.67,
-59.21714286,
-59.32285714,
-44.18142857,
-38.47571429,
-51.63285714,
-43.55571429,
-47.51714286,
-50.61142857,
+
+double vRefDeux[SAMPLES / 2] = {
+4814.742,
+2029.16,
+1761.144,
+856.832,
+804.806,
+505.608,
+483.672,
+383.944,
+281.84,
+267.82,
+212.316,
+181.232,
+156.36,
+177.262,
+137.038,
+137.02,
+152.692,
+107.422,
+108.578,
+89.682,
+86.3,
+85.264,
+85.398,
+71.684,
+67.014,
+70.418,
+73.394,
+48.922,
+55.992,
+75.47,
+67.468,
+58.834,
+
+};
+double vRefUn[SAMPLES / 2] = {
+    3291.70,
+    3291.705714,
+    2015.495714,
+    817.3171429,
+    420.5242857,
+    203.4528571,
+    159.8771429,
+    90.38,
+    160.15,
+    141.18,
+    165.3671429,
+    119.4842857,
+    91.63428571,
+    85.13142857,
+    81.39571429,
+    112.7157143,
+    75.68857143,
+    85.14285714,
+    68.19,
+    57.64714286,
+    53.07714286,
+    64.93714286,
+    68.51857143,
+    50.67,
+    59.21714286,
+    59.32285714,
+    44.18142857,
+    38.47571429,
+    51.63285714,
+    43.55571429,
+    47.51714286,
+    50.61142857,
 
 };
 byte dB;
@@ -279,6 +319,31 @@ uint8_t ADC_read8WhenAvailable(void)
     return ADCH;
 }
 
+double Calcul_correlation(byte aTester)
+{
+    sommeC = 0.0;
+    tampon = 0.0;
+    SommeRef = 0.0;
+    correlation = 0.0;
+    for (i = 0; i < SAMPLES / 2 - 1; i++)
+    {
+            if ( aTester == 1)
+            {
+                sommeC += vReal[i] * vRefUn[i];
+                SommeRef += pow(vRefUn[i], 2);
+            }
+            if (aTester == 2)
+            {
+                sommeC += vReal[i] * vRefDeux[i];
+                SommeRef += pow(vRefDeux[i], 2);
+            }
+                    
+        tampon += pow(vReal[i], 2);
+        
+    }
+    correlation = sommeC / sqrt(tampon * SommeRef);
+    return correlation;
+}
 void setup()
 {
 
@@ -303,6 +368,7 @@ void setup()
     display.display();
     Serial.begin(9600);
     pinMode(led, OUTPUT);
+    pinMode(led2, OUTPUT);
     pinMode(bouton, INPUT_PULLUP);
     pinMode(A0, INPUT);
     ADC_enable();
@@ -314,7 +380,7 @@ void setup()
 
 void loop()
 {
-    
+
     // Pour la fréquence d'échantillonnage on récupère les voltages venues du micro après un filtre passe-haut et l'AOP
     for (i = 0; i < SAMPLES; i++)
     {
@@ -325,56 +391,58 @@ void loop()
             vReal[i] = ADC_read();
             temp = ADC_read();
             somme = vReal[i]; // Somme pour faire la moyenne
-            if (moyenne <= vReal [i])
+            if (moyenne <= vReal[i])
             {
                 moyenne = vReal[i];
             }
-        }       
+        }
         vImag[i] = 0;
     }
-                    // Moyenne permettant de trouver les dbs.
+    // Moyenne permettant de trouver les dbs.
     les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
-    //Serial.println(les_db);
-    somme = 0; //Remise de la somme à zéro pour la prochaine fois 
+    // Serial.println(les_db);
+    somme = 0; // Remise de la somme à zéro pour la prochaine fois
     moyenne = 0;
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
     display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
-    
-    //Boucle pour rajouter un échantillon de son
-   
-    if(digitalRead(bouton)){
+    // Boucle pour rajouter un échantillon de son
+    if (digitalRead(bouton))
+    {
         for (i = 0; i < SAMPLES; i++)
         {
             Serial.println(vReal[i]);
         }
-        Serial.println("\n \n \n \n \n");
-
+        Serial.println("\n \n \n");
     }
-    //Correlation avec un 
-    somme2 = 0.0;
-    tampon = 0.0;
-    SommeUn = 0.0;
-    moyenne2 = 0.0;
-    for(i = 0; i<SAMPLES/2-1; i++)
-    {
-        somme2 += vReal[i]*vRefUn[i];
-        tampon += pow(vReal[i],2);
-        SommeUn += pow(vRefUn[i],2);
-    }
-    correlation = somme2/sqrt(tampon*SommeUn);
-    Serial.println(correlation);
-    Serial.println("\n");
-    somme =0;
-    moyenne =0;
-    if(correlation > 0.95)
+    // Correlation avec Un
+    correlation1 = Calcul_correlation(1);    
+    correlation2 = Calcul_correlation(2);  
+    Serial.println(correlation2);
+   /* Serial.print("Correlation 1 :  ");
+    Serial.println(correlation1);
+    Serial.print("Correlation 2 : ");
+    
+    Serial.println("\n \n");*/
+    
+    if(correlation1 > 0.96)
     {
         digitalWrite(led, HIGH);
-    }else 
-    digitalWrite(led, LOW);
-    
-    // Transformé de fourier et affichage 
+    }else
+    digitalWrite(led, LOW);   
+   
+    if (correlation2 > 0.97)
+    {
+        digitalWrite(led2, HIGH);
+    }
+    else
+        digitalWrite(led2, LOW);
+
+    // Serial.println(correlation1);
+    // Serial.println("\n");
+
+    // Transformé de fourier et affichage
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
         dB = map(vReal[i], 0, 1023, 0, 52);
