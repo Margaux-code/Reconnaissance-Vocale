@@ -350,15 +350,18 @@ void setup()
     byte x = 0;
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.clearDisplay();
-    display.fillRect(0, 0, display.width() - 2, 11, WHITE);
-    display.setTextColor(BLACK);
+    //display.fillRect(0, 0, display.width() - 2, 11, WHITE);
+    //display.setTextColor(BLACK);
+    display.drawRect(0, 0, display.width() - 5, 9, WHITE);
+    display.setCursor(105, 7);
+    display.print(F("dB"));
 
-    x = 16;
+   /* x = 16;
     display.setCursor(x, 2);
     display.print(F("AUDIO"));
     x = 52;
     display.setCursor(x, 2);
-    display.print(F("SPECTROMETER"));
+    display.print(F("SPECTROMETER"));*/
 
     for (byte i = 0; i < SAMPLES / 2 - 1; i++)
     {
@@ -450,8 +453,8 @@ void loop()
     }
     maxpeak = FFT.MajorPeak(vReal, SAMPLES, 5000);
     sprintf(buf, "%04li", les_db);
-    display.setCursor(72, 16);
-    display.print(F("dB:"));
+   // display.setCursor(72, 16);
+   // display.print(F("dB:"));
     display.print(les_db);
     display.display();
 }
