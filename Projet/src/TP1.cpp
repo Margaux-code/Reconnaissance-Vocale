@@ -5,8 +5,9 @@
 #include <arduinoFFT.h>
 #include <Adafruit_SSD1306.h>
 
-byte led = 3;
+byte led = 6;
 byte led2 = 4;
+byte led3 = 5;
 byte bouton = 2;
 int somme = 0;
 
@@ -18,6 +19,7 @@ double SommeRef = 0.0;
 double sommeC = 0.0;
 double correlation1 = 0.0;
 double correlation2 = 0.0;
+double correlation3 = 0.0;
 double correlation = 0.0;
 double tampon = 0.0;
 enum ADC_modes
@@ -47,40 +49,74 @@ Adafruit_SSD1306 display(-1);
 #define SAMPLES 64
 double vReal[SAMPLES];
 double vImag[SAMPLES];
+double vRefTrois[SAMPLES / 2] = {
+    34884.30,
+    15171.04,
+    163.36,
+    60.73,
+    32.23,
+    20.05,
+    13.68,
+    9.92,
+    7.50,
+    5.86,
+    4.69,
+    3.83,
+    3.17,
+    2.67,
+    2.26,
+    1.93,
+    1.66,
+    1.44,
+    1.25,
+    1.08,
+    0.94,
+    0.82,
+    0.71,
+    0.61,
+    0.52,
+    0.45,
+    0.37,
+    0.30,
+    0.24,
+    0.18,
+    0.12,
+    0.06,
+};
 
 double vRefDeux[SAMPLES / 2] = {
-4814.742,
-2029.16,
-1761.144,
-856.832,
-804.806,
-505.608,
-483.672,
-383.944,
-281.84,
-267.82,
-212.316,
-181.232,
-156.36,
-177.262,
-137.038,
-137.02,
-152.692,
-107.422,
-108.578,
-89.682,
-86.3,
-85.264,
-85.398,
-71.684,
-67.014,
-70.418,
-73.394,
-48.922,
-55.992,
-75.47,
-67.468,
-58.834,
+    3000.742,
+    2029.16,
+    1761.144,
+    856.832,
+    804.806,
+    505.608,
+    483.672,
+    383.944,
+    281.84,
+    267.82,
+    212.316,
+    181.232,
+    156.36,
+    177.262,
+    137.038,
+    137.02,
+    152.692,
+    107.422,
+    108.578,
+    89.682,
+    86.3,
+    85.264,
+    85.398,
+    71.684,
+    67.014,
+    70.418,
+    73.394,
+    48.922,
+    55.992,
+    75.47,
+    67.468,
+    58.834,
 
 };
 double vRefUn[SAMPLES / 2] = {
@@ -327,19 +363,23 @@ double Calcul_correlation(byte aTester)
     correlation = 0.0;
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
-            if ( aTester == 1)
-            {
-                sommeC += vReal[i] * vRefUn[i];
-                SommeRef += pow(vRefUn[i], 2);
-            }
-            if (aTester == 2)
-            {
-                sommeC += vReal[i] * vRefDeux[i];
-                SommeRef += pow(vRefDeux[i], 2);
-            }
-                    
+        if (aTester == 1)
+        {
+            sommeC += vReal[i] * vRefUn[i];
+            SommeRef += pow(vRefUn[i], 2);
+        }
+        if (aTester == 2)
+        {
+            sommeC += vReal[i] * vRefDeux[i];
+            SommeRef += pow(vRefDeux[i], 2);
+        }
+        if (aTester == 3)
+        {
+            sommeC += vReal[i] * vRefTrois[i];
+            SommeRef += pow(vRefTrois[i], 2);
+        }
+
         tampon += pow(vReal[i], 2);
-        
     }
     correlation = sommeC / sqrt(tampon * SommeRef);
     return correlation;
@@ -369,7 +409,8 @@ void setup()
     Serial.begin(9600);
     pinMode(led, OUTPUT);
     pinMode(led2, OUTPUT);
-    pinMode(bouton, INPUT_PULLUP);
+    pinMode(led3, OUTPUT);
+   pinMode(bouton, INPUT_PULLUP);
     pinMode(A0, INPUT);
     ADC_enable();
     ADC_setPrescaler(32);
@@ -396,6 +437,7 @@ void loop()
                 moyenne = vReal[i];
             }
         }
+
         vImag[i] = 0;
     }
     // Moyenne permettant de trouver les dbs.
@@ -417,29 +459,39 @@ void loop()
         Serial.println("\n \n \n");
     }
     // Correlation avec Un
-    correlation1 = Calcul_correlation(1);    
-    correlation2 = Calcul_correlation(2);  
-    Serial.println(correlation2);
-   /* Serial.print("Correlation 1 :  ");
-    Serial.println(correlation1);
-    Serial.print("Correlation 2 : ");
-    
-    Serial.println("\n \n");*/
-    
-    if(correlation1 > 0.96)
+    correlation1 = Calcul_correlation(1);
+    correlation2 = Calcul_correlation(2);
+   //correlation3 = Calcul_correlation(3);
+    // Serial.println(correlation2);
+    /* Serial.print("Correlation 1 :  ");
+     Serial.println(correlation1);
+     Serial.print("Correlation 2 : ");
+
+     Serial.println("\n \n");*/
+    /*digitalWrite(led, HIGH);
+    digitalWrite(led2, HIGH);
+    digitalWrite(led3, HIGH);*/
+    if (correlation1 >0.97 && correlation1 > correlation2)
     {
         digitalWrite(led, HIGH);
-    }else
-    digitalWrite(led, LOW);   
-   
-    if (correlation2 > 0.97)
+        digitalWrite(led2, LOW);
+        digitalWrite(led3, LOW);
+    }
+
+    if (correlation2 > correlation1 && correlation2 >0.95)
     {
         digitalWrite(led2, HIGH);
+        digitalWrite(led, LOW);
+        digitalWrite(led3, LOW);
     }
-    else
+  /*  if (correlation3 > 0.95)
+    {
         digitalWrite(led2, LOW);
-
-    // Serial.println(correlation1);
+        digitalWrite(led, LOW);
+        digitalWrite(led3, HIGH);
+    }
+*/
+    // Serial.println(correlation2);
     // Serial.println("\n");
 
     // Transformé de fourier et affichage
