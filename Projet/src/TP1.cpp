@@ -446,28 +446,39 @@ void loop()
     // Serial.println(correlation1);
     // Serial.println("\n");
 
-    display.drawRect(0, 0, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
-    display.setCursor((display.width() - 20) + 3, 2);
+    display.drawRect(15, 0, 10, 6, WHITE); //1
+    display.setCursor(20, 2);
+    display.print(F("1"));
+    
+    display.drawRect(59, 0, 10, 6, WHITE); //2
+    display.setCursor(64, 2);
+    display.print(F("2"));
+    
+    display.drawRect(108, 0, 10, 6, WHITE); //3
+    display.setCursor(113, 2);
+    display.print(F("3"));
+   
+    display.drawRect(0, 8, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
+    display.setCursor((display.width() - 20) + 3, 10);
     display.setTextColor(WHITE);
     display.print(F("dB"));
     
-    display.setCursor(1, 14);
+    display.setCursor(1, 15);
     display.print(F("0"));
     
-    display.setCursor(37, 14);
+    display.setCursor(37, 15);
     display.print(F("30"));
     
-    display.setCursor(73, 14);
+    display.setCursor(73, 15);
     display.print(F("60"));
     
-    display.setCursor(108, 14);
+    display.setCursor(108, 15);
     display.print(F("90"));
     
-    display.fillRect(3, 3, les_db, 4, WHITE);// barre de jauge
-    
-    for(i=0; i < SAMPLES / 2 - 1; i++) // petits carrés 1 2 et 3
+    for(i=0; i < SAMPLES / 2 - 1; i++)
     {
-        display.drawRect(i*8+3, 0, 7, 6, WHITE);   
+        display.fillRect(0, 8, les_db, 6, WHITE);// barre de jauge
+        les_db=0;
     }
     
     // Transformé de fourier et affichage
