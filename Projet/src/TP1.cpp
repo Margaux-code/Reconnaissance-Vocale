@@ -357,16 +357,27 @@ void setup()
     display.setTextColor(WHITE);
     display.print(F("dB"));*/
 
-   /* x = 16;
-    display.setCursor(x, 2);
-    display.print(F("AUDIO"));
-    x = 52;
-    display.setCursor(x, 2);
-    display.print(F("SPECTROMETER"));*/
-
+    display.setCursor(5, 15); //0
+    display.print(F("0"));
+    
+    display.setCursor(25, 15); //1k
+    display.print(F("1k"));
+    
+    display.setCursor(45, 15); //2k
+    display.print(F("2k"));
+    
+    display.setCursor(65, 15);  //3k
+    display.print(F("3k"));
+    
+    display.setCursor(85, 15); //4k
+    display.print(F("4k"));
+    
+    display.setCursor(105, 15); //5k
+    display.print(F("5k"));
+    
     for (byte i = 0; i < SAMPLES / 2 - 1; i++)
     {
-        display.drawFastHLine(i * 4 + 1, display.height() - 1, 3, WHITE);
+        display.drawFastHLine(i * 4 + 1, display.height() - 5, 3, WHITE);
     }
     display.setTextColor(WHITE);
     display.display();
