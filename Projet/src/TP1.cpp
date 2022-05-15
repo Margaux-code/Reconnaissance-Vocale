@@ -358,21 +358,33 @@ void setup()
     display.print(F("dB"));*/
 
     display.setCursor(5, 15); //0
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("0"));
     
     display.setCursor(25, 15); //1k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("1k"));
     
     display.setCursor(45, 15); //2k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("2k"));
     
     display.setCursor(65, 15);  //3k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("3k"));
     
     display.setCursor(85, 15); //4k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("4k"));
     
     display.setCursor(105, 15); //5k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("5k"));
     
     for (byte i = 0; i < SAMPLES / 2 - 1; i++)
@@ -456,34 +468,51 @@ void loop()
 
     // Serial.println(correlation1);
     // Serial.println("\n");
+    
+    int sz = 1;
 
     display.drawRect(15, 0, 10, 6, WHITE); //1
     display.setCursor(20, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("1"));
     
     display.drawRect(59, 0, 10, 6, WHITE); //2
     display.setCursor(64, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("2"));
     
     display.drawRect(108, 0, 10, 6, WHITE); //3
     display.setCursor(113, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("3"));
    
     display.drawRect(0, 8, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
     display.setCursor((display.width() - 20) + 3, 10);
+    display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("dB"));
     
     display.setCursor(1, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("0"));
     
     display.setCursor(37, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("30"));
     
     display.setCursor(73, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("60"));
     
     display.setCursor(108, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
     display.print(F("90"));
     
     for(i=0; i < SAMPLES / 2 - 1; i++)
