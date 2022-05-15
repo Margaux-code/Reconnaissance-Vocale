@@ -5,9 +5,8 @@
 #include <arduinoFFT.h>
 #include <Adafruit_SSD1306.h>
 
-byte led = 6;
+byte led = 3;
 byte led2 = 4;
-byte led3 = 5;
 byte bouton = 2;
 int somme = 0;
 
@@ -16,15 +15,11 @@ int moyenne = 0;
 byte i;
 int a;
 double SommeRef = 0.0;
-double SommeRef1 = 0.0;
 double sommeC = 0.0;
-double sommeC1 = 0.0;
 double correlation1 = 0.0;
 double correlation2 = 0.0;
-double correlation3 = 0.0;
 double correlation = 0.0;
 double tampon = 0.0;
-int pirouette = 0;
 enum ADC_modes
 {
     ADC_A0,
@@ -52,81 +47,46 @@ Adafruit_SSD1306 display(-1);
 #define SAMPLES 64
 double vReal[SAMPLES];
 double vImag[SAMPLES];
-double vRefTrois[SAMPLES / 2] = {
-    1312.01,
-    1064.41,
-    489.16,
-    213.91,
-    233.14,
-    226.49,
-    196.72,
-    218.21,
-    198.35,
-    157.66,
-    113.66,
-    47.86,
-    48.12,
-    109.27,
-    129.05,
-    112.7,
-    118.61,
-    104.64,
-    52.4,
-    19.67,
-    46.25,
-    51.18,
-    20.72,
-    17.93,
-    25.12,
-    31.74,
-    39.98,
-    36.31,
-    27.8,
-    14.34,
-    13.7,
-    17.08,
-
-};
 
 double vRefDeux[SAMPLES / 2] = {
-    3000.742,
-    2029.16,
-    1761.144,
-    856.832,
-    804.806,
-    505.608,
-    483.672,
-    383.944,
-    281.84,
-    267.82,
-    212.316,
-    181.232,
-    156.36,
-    177.262,
-    137.038,
-    137.02,
-    152.692,
-    107.422,
-    108.578,
-    89.682,
-    86.3,
-    85.264,
-    85.398,
-    71.684,
-    67.014,
-    70.418,
-    73.394,
-    48.922,
-    55.992,
-    75.47,
-    67.468,
-    58.834,
+4814.742,
+2029.16,
+1761.144,
+856.832,
+804.806,
+505.608,
+483.672,
+383.944,
+281.84,
+267.82,
+212.316,
+181.232,
+156.36,
+177.262,
+137.038,
+137.02,
+152.692,
+107.422,
+108.578,
+89.682,
+86.3,
+85.264,
+85.398,
+71.684,
+67.014,
+70.418,
+73.394,
+48.922,
+55.992,
+75.47,
+67.468,
+58.834,
 
 };
 double vRefUn[SAMPLES / 2] = {
     3291.70,
     3291.705714,
-    817.495714,
+    2015.495714,
     817.3171429,
     420.5242857,
     203.4528571,
@@ -367,71 +327,48 @@ double Calcul_correlation(byte aTester)
     correlation = 0.0;
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
-        switch(aTester)
-        {
-            case 0:
-             sommeC += vReal[i] *vRefDeux[i];
-            //SommeRef += pow(vRefDeux[i], 2);
-            SommeRef = 18677392.00;
-            break;
-            case 1:
-            sommeC += vReal[i] * vRefUn[i];
-
-            SommeRef = 23433590.00;
-            break;
-            case -1:
-            sommeC += vReal[i] * vRefTrois[i];
-           // SommeRef += pow(vRefTrois[i], 2);
-           SommeRef = 3493741.00;
-            break;
-        }
-      /*  if (aTester == 1)
-        {
-            
-        }
-        if (aTester == 0)
-        {
-           
-        }
-        if (aTester == 2)
-        {
-            
-        }*/
-
+            if ( aTester == 1)
+            {
+                sommeC += vReal[i] * vRefUn[i];
+                SommeRef += pow(vRefUn[i], 2);
+            }
+            if (aTester == 2)
+            {
+                sommeC += vReal[i] * vRefDeux[i];
+                SommeRef += pow(vRefDeux[i], 2);
+            }
+                    
         tampon += pow(vReal[i], 2);
+        
     }
-    correlation = sommeC/ sqrt(tampon * SommeRef);
+    correlation = sommeC / sqrt(tampon * SommeRef);
     return correlation;
-}
-void Calcul_correlation1()
-{
 }
 void setup()
 {
 
     byte x = 0;
+    
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.clearDisplay();
-    display.fillRect(0, 0, display.width() - 2, 11, WHITE);
-    display.setTextColor(BLACK);
-
-    x = 16;
-    display.setCursor(x, 2);
-    display.print(F("AUDIO"));
-    x = 52;
-    display.setCursor(x, 2);
-    display.print(F("SPECTROMETER"));
-
+    //display.fillRect(0, 0, display.width() - 2, 11, WHITE);
+    //display.setTextColor(BLACK);
+    /*display.drawRect(0, 0, display.width() - 20, 9, WHITE);
+    display.setCursor(display.width() - 10, 6);
+    display.setTextColor(WHITE);
+    display.print(F("dB"));*/
+    
+   
+    
     for (byte i = 0; i < SAMPLES / 2 - 1; i++)
     {
-        display.drawFastHLine(i * 4 + 1, display.height() - 1, 3, WHITE);
+        display.drawFastHLine(i * 4 + 1, display.height() - 3, 3, WHITE);
     }
     display.setTextColor(WHITE);
     display.display();
     Serial.begin(9600);
     pinMode(led, OUTPUT);
     pinMode(led2, OUTPUT);
-    pinMode(led3, OUTPUT);
     pinMode(bouton, INPUT_PULLUP);
     pinMode(A0, INPUT);
     ADC_enable();
@@ -459,12 +396,12 @@ void loop()
                 moyenne = vReal[i];
             }
         }
-
         vImag[i] = 0;
     }
     // Moyenne permettant de trouver les dbs.
     les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
     // Serial.println(les_db);
+    int sz =1;
     somme = 0; // Remise de la somme à zéro pour la prochaine fois
     moyenne = 0;
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
@@ -480,48 +417,112 @@ void loop()
         }
         Serial.println("\n \n \n");
     }
-
-    correlation3 = Calcul_correlation(-1);
-     correlation2 = Calcul_correlation(0);
-    correlation1 = Calcul_correlation(1);
-  
     // Correlation avec Un
-
-    Serial.println(correlation1);
+    correlation1 = Calcul_correlation(1);    
+    correlation2 = Calcul_correlation(2);  
     Serial.println(correlation2);
-    Serial.println('correlation3');
-    Serial.println("\n \n \n");
-
-    if (les_db >= 82 && correlation1 < 0.95 && correlation3 < 0.95)
-    {
-        digitalWrite(led2, HIGH);
-        digitalWrite(led, HIGH);
-        digitalWrite(led3, HIGH);
-        delay(100);
-        digitalWrite(led2, LOW);
-        digitalWrite(led, LOW);
-        digitalWrite(led3, LOW);
-    }
-    if (correlation1 > 0.97)
+   /* Serial.print("Correlation 1 :  ");
+    Serial.println(correlation1);
+    Serial.print("Correlation 2 : ");
+    
+    Serial.println("\n \n");*/
+    
+    if(correlation1 > 0.96)
     {
         digitalWrite(led, HIGH);
-        digitalWrite(led2, LOW);
-        digitalWrite(led3, LOW);
-    }
-
-    if (correlation2 > correlation1 && correlation2 > 0.95)
+    }else
+    digitalWrite(led, LOW);   
+   
+    if (correlation2 > 0.97)
     {
         digitalWrite(led2, HIGH);
-        digitalWrite(led, LOW);
-        digitalWrite(led3, LOW);
     }
-    if (correlation3 > 0.97)
-    {
+    else
         digitalWrite(led2, LOW);
-        digitalWrite(led, LOW);
-        digitalWrite(led3, HIGH);
-    }
 
+    // Serial.println(correlation1);
+    // Serial.println("\n");
+    
+     display.drawRect(15, 0, 13, 6, WHITE); //1
+    display.setCursor(20, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("1"));
+    
+    display.drawRect(59, 0, 13, 6, WHITE); //2
+    display.setCursor(64, 2);
+    display.setTextColor(WHITE);
+    display.setTextSize(sz);
+    display.print(F("2"));
+    
+    display.drawRect(108, 0, 13, 6, WHITE); //3
+    display.setCursor(113, 2);
+    display.setTextColor(WHITE);
+    display.print(F("3"));
+    display.setTextSize(sz);
+   
+    display.drawRect(0, 8, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
+    display.setCursor((display.width() - 20) + 3, 10);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("dB"));
+    
+    display.setCursor(1, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("0"));
+    
+    display.setCursor(37, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("30"));
+    
+    display.setCursor(73, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("60"));
+    
+    display.setCursor(108, 15);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("90"));
+
+    display.setCursor(5, 60); //0
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("0"));
+    
+    display.setCursor(25, 60); //1k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("1k"));
+    
+    display.setCursor(45, 60); //2k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("2k"));
+    
+    display.setCursor(65, 60);  //3k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("3k"));
+    
+    display.setCursor(85, 60); //4k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("4k"));
+    
+    display.setCursor(105, 60); //5k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("5k"));
+  
+    for(i=0; i < SAMPLES / 2 - 1; i++)
+    {
+        display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
+        les_db=0;
+    }
+    
     // Transformé de fourier et affichage
     for (i = 0; i < SAMPLES / 2 - 1; i++)
     {
@@ -530,8 +531,8 @@ void loop()
     }
     maxpeak = FFT.MajorPeak(vReal, SAMPLES, 5000);
     sprintf(buf, "%04li", les_db);
-    display.setCursor(72, 16);
-    display.print(F("dB:"));
+   // display.setCursor(72, 16);
+   // display.print(F("dB:"));
     display.print(les_db);
     display.display();
 }
