@@ -451,15 +451,15 @@ void loop()
     
     display.drawRect(59, 0, 13, 6, WHITE); //2
     display.setCursor(64, 2);
-    display.setTextSize(sz);
     display.setTextColor(WHITE);
+    display.setTextSize(sz);
     display.print(F("2"));
     
     display.drawRect(108, 0, 13, 6, WHITE); //3
     display.setCursor(113, 2);
-    display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("3"));
+    display.setTextSize(sz);
    
     display.drawRect(0, 8, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
     display.setCursor((display.width() - 20) + 3, 10);
@@ -487,32 +487,32 @@ void loop()
     display.setTextColor(WHITE);
     display.print(F("90"));
 
-    display.setCursor(5, 15); //0
+    display.setCursor(5, 60); //0
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("0"));
     
-    display.setCursor(25, 15); //1k
+    display.setCursor(25, 60); //1k
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("1k"));
     
-    display.setCursor(45, 15); //2k
+    display.setCursor(45, 60); //2k
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("2k"));
     
-    display.setCursor(65, 15);  //3k
+    display.setCursor(65, 60);  //3k
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("3k"));
     
-    display.setCursor(85, 15); //4k
+    display.setCursor(85, 60); //4k
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("4k"));
     
-    display.setCursor(105, 15); //5k
+    display.setCursor(105, 60); //5k
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("5k"));
