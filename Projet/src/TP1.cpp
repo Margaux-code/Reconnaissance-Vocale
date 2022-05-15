@@ -348,7 +348,7 @@ void setup()
 {
 
     byte x = 0;
-     int sz = 1;
+    int sz = 1;
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.clearDisplay();
     //display.fillRect(0, 0, display.width() - 2, 11, WHITE);
@@ -358,19 +358,19 @@ void setup()
     display.setTextColor(WHITE);
     display.print(F("dB"));*/
     
-    display.drawRect(15, 0, 10, 6, WHITE); //1
+    display.drawRect(15, 0, 13, 6, WHITE); //1
     display.setCursor(20, 2);
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("1"));
     
-    display.drawRect(59, 0, 10, 6, WHITE); //2
+    display.drawRect(59, 0, 13, 6, WHITE); //2
     display.setCursor(64, 2);
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("2"));
     
-    display.drawRect(108, 0, 10, 6, WHITE); //3
+    display.drawRect(108, 0, 13, 6, WHITE); //3
     display.setCursor(113, 2);
     display.setTextSize(sz);
     display.setTextColor(WHITE);
@@ -517,7 +517,7 @@ void loop()
   
     for(i=0; i < SAMPLES / 2 - 1; i++)
     {
-        display.fillRect(0, 8, les_db, 6, WHITE);// barre de jauge
+        display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
         les_db=0;
     }
     
