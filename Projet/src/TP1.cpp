@@ -348,7 +348,7 @@ void setup()
 {
 
     byte x = 0;
-    int sz = 1;
+    
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.clearDisplay();
     //display.fillRect(0, 0, display.width() - 2, 11, WHITE);
@@ -401,6 +401,7 @@ void loop()
     // Moyenne permettant de trouver les dbs.
     les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
     // Serial.println(les_db);
+    int sz =1;
     somme = 0; // Remise de la somme à zéro pour la prochaine fois
     moyenne = 0;
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
