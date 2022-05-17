@@ -517,10 +517,11 @@ void loop()
     display.setTextColor(WHITE);
     display.print(F("5k"));
   
-    for(i=0; i < SAMPLES / 2 - 1; i++)
+    for(i=0; i < SAMPLES-1; i++)
     {
         display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
-        les_db=0;
+         display.fillRect(0, 8, les_db, 4, WHITE);
+        ;
     }
     
     // Transformé de fourier et affichage
