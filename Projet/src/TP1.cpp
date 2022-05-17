@@ -376,74 +376,8 @@ void setup()
     // leftAdjust(8);
     ADC_setReference(ADC_1V1);
     setAnalogMux(ADC_A0);
-}
-
-void loop()
-{
-
-    // Pour la fréquence d'échantillonnage on récupère les voltages venues du micro après un filtre passe-haut et l'AOP
-    for (i = 0; i < SAMPLES; i++)
-    {
-
-        ADC_startConvert();
-        while (!ADC_available())
-        {
-            vReal[i] = ADC_read();
-            temp = ADC_read();
-            somme = vReal[i]; // Somme pour faire la moyenne
-            if (moyenne <= vReal[i])
-            {
-                moyenne = vReal[i];
-            }
-        }
-        vImag[i] = 0;
-    }
-    // Moyenne permettant de trouver les dbs.
-    les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
-    // Serial.println(les_db);
-    int sz =1;
-    somme = 0; // Remise de la somme à zéro pour la prochaine fois
-    moyenne = 0;
-    FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-    FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
-    FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
-    display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
-    // Boucle pour rajouter un échantillon de son
-    if (digitalRead(bouton))
-    {
-        for (i = 0; i < SAMPLES; i++)
-        {
-            Serial.println(vReal[i]);
-        }
-        Serial.println("\n \n \n");
-    }
-    // Correlation avec Un
-    correlation1 = Calcul_correlation(1);    
-    correlation2 = Calcul_correlation(2);  
-    Serial.println(correlation2);
-   /* Serial.print("Correlation 1 :  ");
-    Serial.println(correlation1);
-    Serial.print("Correlation 2 : ");
     
-    Serial.println("\n \n");*/
-    
-    if(correlation1 > 0.96)
-    {
-        digitalWrite(led, HIGH);
-    }else
-    digitalWrite(led, LOW);   
-   
-    if (correlation2 > 0.97)
-    {
-        digitalWrite(led2, HIGH);
-    }
-    else
-        digitalWrite(led2, LOW);
-
-    // Serial.println(correlation1);
-    // Serial.println("\n");
-    
-     display.drawRect(15, 0, 13, 6, WHITE); //1
+    display.drawRect(15, 0, 13, 6, WHITE); //1
     display.setCursor(20, 2);
     display.setTextSize(sz);
     display.setTextColor(WHITE);
@@ -516,13 +450,79 @@ void loop()
     display.setTextSize(sz);
     display.setTextColor(WHITE);
     display.print(F("5k"));
-  
-    for(i=0; i < SAMPLES-1; i++)
+}
+
+void loop()
+{
+
+    // Pour la fréquence d'échantillonnage on récupère les voltages venues du micro après un filtre passe-haut et l'AOP
+    for (i = 0; i < SAMPLES; i++)
     {
-        display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
-         display.fillRect(0, 8, les_db, 4, WHITE);
-        ;
+
+        ADC_startConvert();
+        while (!ADC_available())
+        {
+            vReal[i] = ADC_read();
+            temp = ADC_read();
+            somme = vReal[i]; // Somme pour faire la moyenne
+            if (moyenne <= vReal[i])
+            {
+                moyenne = vReal[i];
+            }
+        }
+        vImag[i] = 0;
     }
+    // Moyenne permettant de trouver les dbs.
+    les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
+    // Serial.println(les_db);
+    int sz =1;
+    somme = 0; // Remise de la somme à zéro pour la prochaine fois
+    moyenne = 0;
+    FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+    FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
+    FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
+    display.fillRect(0, 12, display.width() - 2, display.height() - 13, BLACK);
+    // Boucle pour rajouter un échantillon de son
+    if (digitalRead(bouton))
+    {
+        for (i = 0; i < SAMPLES; i++)
+        {
+            Serial.println(vReal[i]);
+        }
+        Serial.println("\n \n \n");
+    }
+    // Correlation avec Un
+    correlation1 = Calcul_correlation(1);    
+    correlation2 = Calcul_correlation(2);  
+    Serial.println(correlation2);
+   /* Serial.print("Correlation 1 :  ");
+    Serial.println(correlation1);
+    Serial.print("Correlation 2 : ");
+    
+    Serial.println("\n \n");*/
+    
+    if(correlation1 > 0.96)
+    {
+        digitalWrite(led, HIGH);
+    }else
+    digitalWrite(led, LOW);   
+   
+    if (correlation2 > 0.97)
+    {
+        digitalWrite(led2, HIGH);
+    }
+    else
+        digitalWrite(led2, LOW);
+
+    // Serial.println(correlation1);
+    // Serial.println("\n");
+    
+     
+  
+    
+        display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
+        
+    
     
     // Transformé de fourier et affichage
     for (i = 0; i < SAMPLES / 2 - 1; i++)
