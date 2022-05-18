@@ -521,7 +521,7 @@ void loop()
   
     
         display.fillRect(0, 8, les_db, 4, WHITE);// barre de jauge
-        
+        display.fillRect(0, 8, les_db, 4, BLACK);
     
     
     // Transformé de fourier et affichage
