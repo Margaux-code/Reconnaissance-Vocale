@@ -1,4 +1,5 @@
 
+
 #include <Arduino.h>
 #include <avr/io.h>
 #include <Wire.h>
@@ -395,17 +396,10 @@ void setup()
 {
 
     byte x = 0;
+    int sz = 1;
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.clearDisplay();
-    display.fillRect(0, 0, display.width() - 2, 11, WHITE);
-    display.setTextColor(BLACK);
-
-    x = 16;
-    display.setCursor(x, 2);
-    display.print(F("AUDIO"));
-    x = 52;
-    display.setCursor(x, 2);
-    display.print(F("SPECTROMETER"));
+   
 
     for (byte i = 0; i < SAMPLES / 2 - 1; i++)
     {
@@ -424,6 +418,55 @@ void setup()
     // leftAdjust(8);
     ADC_setReference(ADC_1V1);
     setAnalogMux(ADC_A0);
+
+    display.drawRect(15, 0, 13, 10, WHITE); //1
+    display.setCursor(20, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("1"));
+    
+    display.drawRect(59, 0, 13, 10, WHITE); //2
+    display.setCursor(64, 2);
+    display.setTextColor(WHITE);
+    display.setTextSize(sz);
+    display.print(F("2"));
+    
+    display.drawRect(108, 0, 13, 10, WHITE); //3
+    display.setCursor(113, 2);
+    display.setTextColor(WHITE);
+    display.print(F("3"));
+    display.setTextSize(sz);
+   
+    
+    /*display.setCursor(5, 60); //0
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("0"));
+    
+    display.setCursor(25, 60); //1k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("1k"));
+    
+    display.setCursor(45, 60); //2k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("2k"));
+    
+    display.setCursor(65, 60);  //3k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("3k"));
+    
+    display.setCursor(85, 60); //4k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("4k"));
+    
+    display.setCursor(105, 60); //5k
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("5k"));*/
 }
 
 void loop()
@@ -450,6 +493,7 @@ void loop()
      Serial.println(moyenne);
     // Moyenne permettant de trouver les dbs.
     les_db = 37.400 * log(moyenne) - 175.75; // Calcul des décibels a partir du mappage experimental (voir excel)
+    int sz =1;
     // Serial.println(les_db);
     somme = 0; // Remise de la somme à zéro pour la prochaine fois
     moyenne = 0;
@@ -478,6 +522,41 @@ void loop()
     Serial.println(correlation3);
     Serial.println("\n \n \n");*/
 
+    display.setCursor(1, 17);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("0"));
+    
+    display.setCursor(34, 17);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("30"));
+    
+    display.setCursor(69, 17);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("60"));
+    
+    display.setCursor(104, 17);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("90"));
+
+
+display.fillRect(0, 10, display.width() - 20, 6, WHITE); // ecran 128 x 64 pixels, jauge
+    display.setCursor((display.width() - 20) + 3, 11);
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.print(F("dB"));
+
+for (i = 0; i < SAMPLES / 2 - 1; i++)
+    {
+        //display.fillRect(0, 8, les_db, 5, WHITE);// barre de jauge
+    display.fillRect(2, 11, les_db, 4, BLACK);
+    }
+    
+
+
     if (les_db >= 80 && correlation1 < 0.97 && correlation2 <0.95)
     {
         digitalWrite(led2, LOW);
@@ -491,12 +570,36 @@ void loop()
          digitalWrite(led2, LOW);
         digitalWrite(led, LOW);
         digitalWrite(led3, LOW);
+        
+        display.drawRect(15, 0, 13, 10, WHITE); //1
+    display.setCursor(20, 2);
+    display.setTextSize(sz);
+    display.setTextColor(WHITE);
+    display.print(F("1"));
+    
+    display.drawRect(59, 0, 13, 10, WHITE); //2
+    display.setCursor(64, 2);
+    display.setTextColor(WHITE);
+    display.setTextSize(sz);
+    display.print(F("2"));
+    
+    display.drawRect(108, 0, 13, 10, WHITE); //3
+    display.setCursor(113, 2);
+    display.setTextColor(WHITE);
+    display.print(F("3"));
+    display.setTextSize(sz);
     }
     if (correlation1 > 0.97)
     {
         digitalWrite(led, HIGH);
         digitalWrite(led2, LOW);
         digitalWrite(led3, LOW);
+        display.fillRect(15, 0, 13, 10, WHITE); //1
+        display.setCursor(20, 2);
+        display.setTextSize(sz);
+        display.setTextColor(BLACK);
+        display.print(F("1"));
+       
     }
 
     if (correlation2 > correlation1 && correlation2 > 0.95)
@@ -504,12 +607,24 @@ void loop()
         digitalWrite(led2, HIGH);
         digitalWrite(led, LOW);
         digitalWrite(led3, LOW);
+        display.fillRect(59, 0, 13, 10, WHITE); //2
+        display.setCursor(64, 2);
+        display.setTextColor(BLACK);
+        display.setTextSize(sz);
+        display.print(F("2"));
+        
     }
     if (correlation3 > 0.97)
     {
         digitalWrite(led2, LOW);
         digitalWrite(led, LOW);
         digitalWrite(led3, HIGH);
+        display.fillRect(108, 0, 13, 10, WHITE); //3
+        display.setCursor(113, 2);
+        display.setTextColor(BLACK);
+        display.print(F("3"));
+        display.setTextSize(sz);
+        
     }
 
     // Transformé de fourier et affichage
@@ -520,8 +635,7 @@ void loop()
     }
     maxpeak = FFT.MajorPeak(vReal, SAMPLES, 5000);
     sprintf(buf, "%04li", les_db);
-    display.setCursor(72, 16);
-    display.print(F("dB:"));
+    display.setCursor(100, 55);
     display.print(les_db);
     display.display();
 }
